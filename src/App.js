@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import '@gooddata/react-components/styles/css/main.css';
-
+import moment from 'moment'
 import { ColumnChart } from '@gooddata/react-components';
 
 const grossProfitMeasure = '/gdc/md/xms7ga4tf3g3nzucd8380o2bev8oeknp/obj/6877';
@@ -10,6 +10,13 @@ const dateAttributeInMonths = '/gdc/md/xms7ga4tf3g3nzucd8380o2bev8oeknp/obj/2142
 const dateAttribute = '/gdc/md/xms7ga4tf3g3nzucd8380o2bev8oeknp/obj/2180';
 
 class App extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            year: 2016,
+            month: 'January',
+        }
+    }
 
     getMonthFilter() {
         return {
@@ -17,8 +24,8 @@ class App extends Component {
                 dataSet: {
                     uri: dateAttribute
                 },
-                from: '2016-01-01',
-                to: '2016-01-31'
+                from: moment().year(this.state.year).month(this.state.month).startOf('month').format('YYYY-MM-DD'),
+                to: moment().year(this.state.year).month(this.state.month).endOf('month').format('YYYY-MM-DD'),
             }
 
         }
@@ -54,21 +61,14 @@ class App extends Component {
         }
     }
 
+    onChangeMonth = e => {
+        e && this.setState({ month: e.target.value })
+    }
+
     renderDropdown() {
         return (
-            <select defaultValue="1">
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
+            <select defaultValue="January" onChange={this.onChangeMonth}>
+                {moment.months().map((month, key) => <option value={month} key={key}>{month}</option>)}
             </select>
         )
     }
@@ -81,7 +81,7 @@ class App extends Component {
 
         return (
             <div className="App">
-                <h1>$ Gross Profit in month {this.renderDropdown()} 2016</h1>
+                <h1>$ Gross Profit in month {this.renderDropdown()} {this.state.year}</h1>
                 <div>
                     <ColumnChart
                         measures={measures}
